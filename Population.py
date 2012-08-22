@@ -46,7 +46,7 @@ class Population():
         for o in range(pop_size):
             self.population[o] = Organism(MetNet, met, reac, food, targets, gen, p, True)
         
-    def step(self):rue
+    def step(self):
         #da um passo na rede booleana e atualiza os estados das reacoes quimicas
         #e incrementa/decrementa a biomassa de cada individuo da populacao
         for o in range(pop_size):
@@ -110,7 +110,7 @@ def list_step(population, lista_o):
     for o in range(len(lista_o)):
         genestr = lista_o[o].control.change_state()
         lista_o[o].chemistry.update_reactions(lista_o[o].control.switch_dict)
-        enzime_fraction = 0rue
+        enzime_fraction = 0
         for j in range(len(genestr)- lista_o[o].control.number_food_actual):
             enzime_fraction+=genestr[j + lista_o[o].control.number_food_actual]
         enzime_fraction = float(enzime_fraction)/reac
@@ -236,7 +236,6 @@ def constant_size_environment_random():
     division = []
     env_change_rate = 0.02
     chg = False
-rue
     media_idades_reprod = []
 
     while True:
@@ -280,7 +279,7 @@ def constant_size_environment_periodic():
         
 
             
-        if self.time%100 == 0:
+        if a.time%100 == 0:
             chg = True
             env_ind = (env_ind + 1)%2
         for o in range(pop_size):

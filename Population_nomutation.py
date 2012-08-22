@@ -57,41 +57,7 @@ class Population():
             for j in range(len(genestr)- self.population[o].control.number_food_actual):
                 enzime_fraction+=genestr[j + self.population[o].control.number_food_actual]
             enzime_fraction = float(enzime_fraction)/reac
-            self.population[o].biomasdef constant_size_environment_periodic():
-    a = Population()
-    division = []
-    chg = False
-    env_ind = 0
-
-    media_idades_reprod = []
-
-    while True:
-        a.step()
-        
-
-            
-        if self.time%100 == 0:
-            chg = True
-            env_ind = (env_ind + 1)%2
-        for o in range(pop_size):
-            if chg:
-                a.population[o].change_environment_org(environ_list[env_ind])
-                
-            if a.population[o].biomass > division_threshold:
-                division.append(o)
-        if len(division) > 0:
-            a.divide(division, rate, MetNet)
-            division = []
-
-        if a.time%500 == 0:
-            media_idades_reprod.append(calculamedia([a.population[ind].mother_record for ind in range(pop_size)]))
-            print 'media_idades'
-            fobj = open('media_idades.txt', 'a')
-            fobj.write('media_idades_reprod:')
-            fobj.write(str(media_idades_reprod) + '\n\n')
-            fobj.close()
-        
-        chg = Falses = self.population[o].biomass + self.population[o].chemistry.path_to_target() - enzime_fraction
+            self.population[o].biomass = self.population[o].biomass + self.population[o].chemistry.path_to_target() - enzime_fraction
             self.population[o].age += 1
         self.time += 1
         
@@ -315,7 +281,7 @@ def constant_size_environment_periodic():
         
 
             
-        if self.time%100 == 0:
+        if a.time%100 == 0:
             chg = True
             env_ind = (env_ind + 1)%2
         for o in range(pop_size):
