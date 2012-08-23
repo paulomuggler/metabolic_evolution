@@ -275,12 +275,12 @@ class Control(nx.DiGraph):
 
     def draw_BN(graph, positions, listadenos):
 
-        plt.clf()
-        nx.draw_networkx_labels(graph, positions)
-        nx.draw_networkx_nodes(graph,positions, nodelist = listadenos, node_color=graph.colors,node_size=150)
-        nx.draw_networkx_edges(graph,positions,alpha=0.3)
-        plt.draw()
-        plt.draw()
+##        plt.clf()
+##        nx.draw_networkx_labels(graph, positions)
+##        nx.draw_networkx_nodes(graph,positions, nodelist = listadenos, node_color=graph.colors,node_size=150)
+##        nx.draw_networkx_edges(graph,positions,alpha=0.3)
+##        plt.draw()
+##        plt.draw()
         pass
     
 def randomenv():
