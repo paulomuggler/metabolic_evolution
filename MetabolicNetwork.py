@@ -86,7 +86,7 @@ class MetabolicNetwork(nx.DiGraph):
             #pos[react+metabolites] = (metabolites, float(react)*metabolites/reactions)
             self.add_node(self.number_metabolites + react,{'Type':'R', 'on': False})
 ##            inm = rndm.randint(1,3)
-            inm = 3
+            inm = 2
 ##            outm = rndm.randint(1,3)  #talvez fazer isso ser igual a um...
             outm = 1
             cj = rndm.sample([x for x in self.nodes() if self.node[x]['Type']=='M'],inm+outm)

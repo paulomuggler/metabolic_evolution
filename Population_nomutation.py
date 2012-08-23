@@ -10,13 +10,13 @@ from copy import deepcopy
 
 
 food = 20
-targets = 3
+targets = 1
 met = 50
 reac = 50
 gen = 50
 p = 0.2
 pop_size = 100
-division_threshold = 200
+division_threshold = 50
 record_size = 10
 rate = 0
 number_environments = 2
@@ -29,6 +29,7 @@ number_environments = 2
 ##    environ_list.append([(1 == rndm.randint(0,1)) for i in range(food)])
 
 environ_list = [[True]*10 + [False]*10,[False]*10 + [True]*10]
+
 
 
 print 'environment!'
@@ -297,14 +298,37 @@ def constant_size_environment_periodic():
         if a.time%500 == 0:
             media_idades_reprod.append(calculamedia([a.population[ind].mother_record for ind in range(pop_size)]))
             print 'media_idades'
-            fobj = open('media_idades.txt', 'a')
+            fobj = open('media_idades0.txt', 'a')
             fobj.write('media_idades_reprod:')
             fobj.write(str(media_idades_reprod) + '\n\n')
             fobj.close()
         
         chg = False          
             
+def constant_size_environment_constant():
+    a = Population()
+    division = []
+
+    media_idades_reprod = []
+
+    while True:
+        a.step()
         
+
+        for o in range(pop_size):                
+            if a.population[o].biomass > division_threshold:
+                division.append(o)
+        if len(division) > 0:
+            a.divide(division, rate, MetNet)
+            division = []
+
+        if a.time%100 == 0:
+            media_idades_reprod.append(calculamedia([a.population[ind].mother_record for ind in range(pop_size)]))
+            print 'media_idades'
+            fobj = open('media_idades0.txt', 'a')
+            fobj.write('media_idades_reprod:')
+            fobj.write(str(media_idades_reprod) + '\n\n')
+            fobj.close()
         
 
 ##monitormutation()
@@ -312,3 +336,4 @@ def constant_size_environment_periodic():
 ##growing_descendents()
 ##constant_size_environment_random()
 constant_size_environment_periodic()
+##constant_size_environment_constant()
