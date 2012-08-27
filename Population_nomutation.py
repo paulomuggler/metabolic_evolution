@@ -47,6 +47,7 @@ class Population():
         self.population = [None]*pop_size
         for o in range(pop_size):
             self.population[o] = Organism(MetNet, met, reac, food, targets, gen, p, True)
+            self.population[o].species = o
         
     def step(self):
         #da um passo na rede booleana e atualiza os estados das reacoes quimicas
@@ -67,10 +68,11 @@ class Population():
         for o in lista_o:
             self.population.append(self.population[o].mutate(rate, MetNet))
             self.population[-1].mother_record = self.population[o].age
+            self.population[-1].species = self.population[o].species
             fobj = open('divide0.txt', 'a')
-            fobj.write('dividiu: ' + str(o) + ' com a idade ' + str(self.population[o].age) + '\n')
+            fobj.write('dividiu: ' + str(o) + ' da especie: ' + str(self.population[o].species) + ' com a idade ' + str(self.population[o].age) + '\n')
             fobj.close()
-
+            
 
  
         
@@ -91,6 +93,7 @@ class Population():
                 fobj.write('\n+++++++++++++++++++++++++++\n')
                 fobj.close()
 
+
             self.population[o].age = 0
             self.population[o].biomass = 0
 
@@ -106,6 +109,10 @@ class Population():
             decr -= 1
         fobj.write('\ndivision ages:\n' + str([self.population[ind].record for ind in range(pop_size)]))
         fobj.write('\nmothers ages:\n' + str([self.population[ind].mother_record for ind in range(pop_size)]) + '\n\n')
+        fobj.close()
+
+        fobj = open('species0.txt', 'a')
+        fobj.write(str([self.population[ind].species for ind in range(pop_size)]) + '\n')
         fobj.close()
 
 def list_step(population, lista_o):

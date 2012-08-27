@@ -21,6 +21,7 @@ class Organism(nx.DiGraph):
         self.age = 0
         self.record = 'a'
         self.mother_record = 'a'
+        self.species = 'a'
 
         self.number_targets = targets
         food_list = range(number_food)
@@ -44,13 +45,15 @@ class Organism(nx.DiGraph):
             self.control = Control(number_food, met, genes_list, p, reac, inicial)
 ##            print 'dicionario inicial:'
 ##            print self.control.switch_dict
-            self.biomass = self.chemistry.update_reactions(self.control.switch_dict)
+            self.chemistry.update_reactions(self.control.switch_dict)
+            self.biomass = 0
 ##            print 'biomass_init'
 ##            print self.biomass
         else: #caso a populacao seja gerada de uma mutacao...
             self.control = control
             self.chemistry = self.clean_met_net(MetNet, control.genes_list, food_list)
-            self.biomass = self.chemistry.update_reactions(self.control.switch_dict)
+            self.chemistry.update_reactions(self.control.switch_dict)
+            self.biomass = 0
             
 
     def clean_met_net(self, MetNet, genes_list, food_list):

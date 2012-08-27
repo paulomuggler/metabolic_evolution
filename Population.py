@@ -8,6 +8,13 @@ from Control import Control
 from Organism import Organism
 from copy import deepcopy
 
+## Eu costumo pensar a evolucao como um processamento de informacao em curso,
+## e naturalmente a espacialidade tem um papel fundamental nisso tudo.
+## Mas a localizacao geografica de um evento funciona mais como determinacao
+## de condicoes de contorno para uma ou mais populacoes, especialmente no
+## tocante a geografia (clima, relevo, topologia do espaco), tambem em relacao
+## a outras populacoes, mediando trocas possiveis.
+
 
 food = 20
 targets = 1
