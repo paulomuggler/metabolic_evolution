@@ -481,7 +481,7 @@ def constant_size_environment_constant():
         if a.time%ta == 0:
             media_idades_reprod.append(calculamedia([a.population[ind].mother_record for ind in range(pop_size)]))
             print 'media_idades'
-            fobj = open('media_idades.txt', 'a')
+            fobj = open('media_idades.txt', 'w')
             fobj.write('media_idades_reprod:')
             fobj.write(str(media_idades_reprod) + '\n\n')
             fobj.close()
