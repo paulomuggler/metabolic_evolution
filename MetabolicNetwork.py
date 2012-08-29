@@ -47,6 +47,15 @@ class MetabolicNetwork(nx.DiGraph):
             
             self.target_amount = self.path_to_target() ##Acho que nao ta sendo usado
             self.turn_off_met()
+            
+        elif env_list == 'difficult':
+            self.generate_difficult()
+            print 'Difficult Environment'
+            fobj = open('environmentcase.txt', 'w')
+            fobj.write('Difficult')
+            fobj.close()
+            self.target_amount = self.path_to_target()
+            self.turn_off_met()
 
         else:
             self.generate_random()
@@ -68,7 +77,70 @@ class MetabolicNetwork(nx.DiGraph):
             self.target_amount = self.path_to_target() ##Acho que nao ta sendo usado
             self.turn_off_met()
             
+    def generate_difficult(self):
+        for food in range(20):
+            self.add_node(food, {'Type':'M','Food': True ,'Target': False, 'Flowing': True})
+        for targ in range(1):
+            self.add_node(targ + 20, {'Type':'M','Food': False ,'Target': True, 'Flowing': False})
+        for metab in range(14):
+            self.add_node(21 + metab, {'Type':'M','Food': False ,'Target': False, 'Flowing': False})
             
+        for react in range(17):
+            self.add_node(35 + react,{'Type':'R', 'on': False})
+
+        self.add_edge(0, 35, {'weight':rndm.randint(1,5)})
+        self.add_edge(1, 35, {'weight':rndm.randint(1,5)})
+        self.add_edge(2, 36, {'weight':rndm.randint(1,5)})
+        self.add_edge(3, 36, {'weight':rndm.randint(1,5)})
+        self.add_edge(4, 37, {'weight':rndm.randint(1,5)})
+        self.add_edge(5, 37, {'weight':rndm.randint(1,5)})
+        self.add_edge(6, 38, {'weight':rndm.randint(1,5)})
+        self.add_edge(7, 38, {'weight':rndm.randint(1,5)})
+        self.add_edge(8, 39, {'weight':rndm.randint(1,5)})
+        self.add_edge(9, 39, {'weight':rndm.randint(1,5)})
+        self.add_edge(10, 46, {'weight':rndm.randint(1,5)})
+        self.add_edge(11, 46, {'weight':rndm.randint(1,5)})
+        self.add_edge(12, 40, {'weight':rndm.randint(1,5)})
+        self.add_edge(13, 40, {'weight':rndm.randint(1,5)})
+        self.add_edge(14, 41, {'weight':rndm.randint(1,5)})
+        self.add_edge(15, 41, {'weight':rndm.randint(1,5)})
+        self.add_edge(16, 42, {'weight':rndm.randint(1,5)})
+        self.add_edge(17, 42, {'weight':rndm.randint(1,5)})
+        self.add_edge(18, 43, {'weight':rndm.randint(1,5)})
+        self.add_edge(19, 43, {'weight':rndm.randint(1,5)})
+        self.add_edge(21, 44, {'weight':rndm.randint(1,5)})
+        self.add_edge(22, 49, {'weight':rndm.randint(1,5)})
+        self.add_edge(23, 45, {'weight':rndm.randint(1,5)})
+        self.add_edge(24, 45, {'weight':rndm.randint(1,5)})
+        self.add_edge(25, 47, {'weight':rndm.randint(1,5)})
+        self.add_edge(26, 47, {'weight':rndm.randint(1,5)})
+        self.add_edge(27, 48, {'weight':rndm.randint(1,5)})
+        self.add_edge(28, 48, {'weight':rndm.randint(1,5)})
+        self.add_edge(29, 44, {'weight':rndm.randint(1,5)})
+        self.add_edge(30, 49, {'weight':rndm.randint(1,5)})
+        self.add_edge(31, 50, {'weight':rndm.randint(1,5)})
+        self.add_edge(32, 50, {'weight':rndm.randint(1,5)})
+        self.add_edge(33, 51, {'weight':rndm.randint(1,5)})
+        self.add_edge(34, 51, {'weight':rndm.randint(1,5)})
+        self.add_edge(35, 29, {'weight':rndm.randint(1,5)})
+        self.add_edge(36, 21, {'weight':rndm.randint(1,5)})
+        self.add_edge(37, 22, {'weight':rndm.randint(1,5)})
+        self.add_edge(38, 23, {'weight':rndm.randint(1,5)})
+        self.add_edge(39, 24, {'weight':rndm.randint(1,5)})
+        self.add_edge(40, 25, {'weight':rndm.randint(1,5)})
+        self.add_edge(41, 26, {'weight':rndm.randint(1,5)})
+        self.add_edge(42, 27, {'weight':rndm.randint(1,5)})
+        self.add_edge(43, 28, {'weight':rndm.randint(1,5)})
+        self.add_edge(44, 30, {'weight':rndm.randint(1,5)})
+        self.add_edge(45, 31, {'weight':rndm.randint(1,5)})
+        self.add_edge(46, 32, {'weight':rndm.randint(1,5)})
+        self.add_edge(47, 33, {'weight':rndm.randint(1,5)})
+        self.add_edge(48, 34, {'weight':rndm.randint(1,5)})
+        self.add_edge(49, 20, {'weight':rndm.randint(1,5)})
+        self.add_edge(50, 20, {'weight':rndm.randint(1,5)})
+        self.add_edge(51, 20, {'weight':rndm.randint(1,5)})
+        
+                
        
         
     def generate_random(self):
