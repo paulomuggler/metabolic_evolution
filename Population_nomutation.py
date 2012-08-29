@@ -496,5 +496,5 @@ def constant_size_environment_constant():
 ##growing_descendents()
 ##constant_size_environment_random()
 ##constant_size_environment_periodic()
-##constant_size_environment_periodic_3()
-constant_size_environment_constant()
+constant_size_environment_periodic_3()
+##constant_size_environment_constant()
