@@ -193,92 +193,6 @@ def headertofile(string):
     fobj.close()
 
 
-def monitormutation():     
-    food_total = 10
-    reac_total = 70
-    metabolites = 80
-    food = 8
-    reac = 20
-    targets = 1
-    p = 0.2
-    rate = 0.0005
-
-    if targets + food > metabolites:
-        print 'Tem numero errado...'
-
-    react_list = [x + metabolites for x in range(reac_total)]
-    food_list = sorted(rndm.sample(range(food_total), food))
-    genes_list = food_list #+ sorted(rndm.sample(react_list, reac))
-
-
-    primeira_geracao = Control(food_total, metabolites, genes_list, p, reac_total, inicial = True)
-    dnap = primeira_geracao.export_code()
-    dna = deepcopy(dnap)
-
-    for j in range(50):
-
-        print 'etapa' + str(j)
-        gerac_um = Control(food_total, metabolites, [], 0, reac_total, DNA = dna)
-        dna = mutate_DNA(dna, rate)
-        time.sleep(0.5)
-
-
-    dnamutante = crossover_DNA(dna, dnap, 2)
-    gerac_mutante = Control(food_total, metabolites, [], 0, reac_total, DNA = dnamutante)
-
-
-def constant_size_population():
-    a = Population()
-    division = []
-
-    for my_step in xrange(end_step):
-        a.step()
-        for o in range(pop_size):
-    ##        if a.population[o].biomass > 190:
-    ##            print 'biomass ' + str(o) + ':' + str(a.population[o].biomass)
-            if a.population[o].biomass > division_threshold:
-                division.append(o)
-        if len(division) > 0:
-            print 'division: ' + str(division)
-            a.divide(division, rate, MetNet)
-            division = []
-##        print 'tempo: ' + str(a.time)
-
-def growing_descendents():
-    fathers_list = []
-    descendent_list = []
-    division = []
-
-    a = Population()
-    while len(fathers_list) == 0:
-        a.step()
-        for o in range(pop_size):
-            if a.population[o].biomass > division_threshold:
-                fathers_list.append(a.population[o])
-                descendent_list.append(a.population[o].mutate(rate, MetNet))
-                a.population[o].biomass = 0
-                a.population[o].age = 0
-                print str(o) + ' appended!!'
-                print 'tempo: ' + str(a.time)
-    print 'father control: ' + str(fathers_list[0].control.edges())
-    print 'son control: ' + str(descendent_list[0].control.edges())
-    print 'father genes: ' + str([fathers_list[0].control.node[n]['on'] for n in fathers_list[0].control.nodes()])
-    print 'son genes: ' + str([descendent_list[0].control.node[n]['on'] for n in descendent_list[0].control.nodes()])
-    time.sleep(100)
-    for my_step in xrange(end_step):
-        list_step(a, descendent_list)
-        list_step(a, fathers_list)
-        for o in range(len(descendent_list)):
-            if descendent_list[o].biomass > division_threshold:
-                print 'filho dividiu com essa idade: ' + str(descendent_list[o].age)
-                descendent_list[o].biomass = 0
-                descendent_list[o].age = 0
-        for o in range(len(fathers_list)):
-            if fathers_list[o].biomass > division_threshold:
-                print 'pai dividiu com essa idade: ' + str(fathers_list[o].age)
-                fathers_list[o].biomass = 0
-                fathers_list[o].age = 0
-
 def constant_size_environment_random():
 
     headertofile('constant_size_environment_random')
@@ -294,7 +208,7 @@ def constant_size_environment_random():
     fobj.write('environ_list: ' + str(environ_list))
     fobj.close()
         
-    MetNet = MetabolicNetwork(met, reac, food, targets, environ_list)
+    MetNet = MetabolicNetwork(met, reac, food, targets, difficult or environ_list)
     
     fobj = open(base_path+'MetNet.txt', 'a')
     fobj.write('Metabolic Network' + str(MetNet.edges()) + '\n\n' + str(MetNet.edge))
@@ -350,7 +264,7 @@ def constant_size_environment_periodic():
     fobj.write('environ_list: ' + str(environ_list))
     fobj.close()
         
-    MetNet = MetabolicNetwork(met, reac, food, targets, environ_list)
+    MetNet = MetabolicNetwork(met, reac, food, targets, difficult or environ_list)
 
     fobj = open(base_path+'MetNet.txt', 'a')
     fobj.write('Metabolic Network' + str(MetNet.edges()) + '\n\n' + str(MetNet.edge))
@@ -407,7 +321,7 @@ def constant_size_environment_periodic_3():
     fobj.write('environ_list: ' + str(environ_list))
     fobj.close()
         
-    MetNet = MetabolicNetwork(met, reac, food, targets, environ_list)
+    MetNet = MetabolicNetwork(met, reac, food, targets, difficult or environ_list)
 
     fobj = open(base_path+'MetNet.txt', 'a')
     fobj.write('Metabolic Network' + str(MetNet.edges()) + '\n\n' + str(MetNet.edge))
@@ -494,7 +408,7 @@ def constant_size_environment_constant():
             fobj.close()
         
 
-end_step = 3
+end_step = 1000000
 
 print ('executing from '+sys.argv[1])
 execution = open(sys.argv[1])
@@ -523,9 +437,7 @@ while True:
   
 print '...Done. Ciao!'
   
-##monitormutation()
-##constant_size_population()
-##growing_descendents()
+
 ##constant_size_environment_random()
 ##constant_size_environment_periodic()
 ##constant_size_environment_periodic_3()

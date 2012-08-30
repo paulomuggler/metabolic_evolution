@@ -50,10 +50,6 @@ class MetabolicNetwork(nx.DiGraph):
             
         elif env_list == 'difficult':
             self.generate_difficult()
-            print 'Difficult Environment'
-            fobj = open('environmentcase.txt', 'w')
-            fobj.write('Difficult')
-            fobj.close()
             self.target_amount = self.path_to_target()
             self.turn_off_met()
 

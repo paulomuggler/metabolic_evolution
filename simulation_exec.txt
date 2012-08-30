@@ -1,0 +1,12 @@
+constant_size_environment_random()	organised/random/mutation/			0.0001
+constant_size_environment_periodic()	organised/periodic/mutation/			0.0001
+constant_size_environment_constant()	organised/constant/mutation/			0.0001
+constant_size_environment_random()	organised/random/no_mutation/			0
+constant_size_environment_periodic()	organised/periodic/no_mutation/			0
+constant_size_environment_constant()	organised/constant/no_mutation/			0
+constant_size_environment_random()	organised/difficult/random/mutation/		0.0001	difficult
+constant_size_environment_periodic()	organised/difficult/periodic/mutation/		0.0001	difficult
+constant_size_environment_constant()	organised/difficult/constant/mutation/		0.0001	difficult
+constant_size_environment_random()	organised/difficult/random/no_mutation/		0	difficult
+constant_size_environment_periodic()	organised/difficult/periodic/no_mutation/	0	difficult
+constant_size_environment_constant()	organised/difficult/constant/no_mutation/	0	difficult
