@@ -1,3 +1,7 @@
+#!/usr/bin/python
+
+import os
+import sys
 import networkx as nx
 import matplotlib.pyplot as plt
 import random as rndm
@@ -8,18 +12,19 @@ from Control import Control
 from Organism import Organism
 from copy import deepcopy
 
-
 food = 20
 targets = 1
-met = 50
-reac = 50
-gen = 50
+met = 35
+reac = 17
+gen = 17
 p = 0.2
 pop_size = 100
 division_threshold = 50
 record_size = 10
 rate = 0.0001
-number_environments = 2
+number_environments = 3
+
+peso = 1.0/3
 
 ta = 100
 tb = 10000
@@ -65,7 +70,7 @@ class Population():
             self.population.append(self.population[o].mutate(rate, MetNet))
             self.population[-1].mother_record = self.population[o].age
             self.population[-1].species = self.population[o].species
-            fobj = open('divide.txt', 'a')
+            fobj = open(base_path+'divide.txt', 'a')
             fobj.write('dividiu: ' + str(o) + ' da especie: ' + str(self.population[o].species) + ' com a idade ' + str(self.population[o].age) + '\n')
             fobj.close()
             
@@ -82,7 +87,7 @@ class Population():
                 self.records.pop()
                 self.worst_record = self.records[-1]
                 print 'records!'
-                fobj = open('records.txt', 'a')
+                fobj = open(base_path+'records.txt', 'a')
                 fobj.write('records:' + str(self.records))
                 fobj.write('\n+++++++++++++++++++++++++++\n')
                 fobj.write(str(self.population[o].control.edges()))
@@ -95,7 +100,7 @@ class Population():
 
         popping_list = sorted(rndm.sample(range(len(self.population)), len(lista_o)))
         print 'divide!'
-        fobj = open('divide.txt', 'a')
+        fobj = open(base_path+'divide.txt', 'a')
         fobj.write('popping: ' + str(popping_list))
         
 
@@ -107,12 +112,12 @@ class Population():
         fobj.write('\nmothers ages:\n' + str([self.population[ind].mother_record for ind in range(pop_size)]) + '\n\n')
         fobj.close()
 
-        fobj = open('species.txt', 'a')
+        fobj = open(base_path+'species.txt', 'a')
         fobj.write(str([self.population[ind].species for ind in range(pop_size)]) + '\n')
         fobj.close()
 
     def genometofile(self):
-        fobj = open('genome.txt', 'a')
+        fobj = open(base_path+'genome.txt', 'a')
         fobj.write('timestep: ' + str(self.time) + '\n')
         r = 'a'
         ix = 0
@@ -170,7 +175,7 @@ def calculamedia(listaas):
 
 def headertofile(string):
 
-    fobj = open('header.txt', 'a')
+    fobj = open(base_path+'header.txt', 'a')
     fobj.write(string)
     fobj.write('\n\n' + 'food = ' + str(food))
     fobj.write('\n' + 'targets = ' + str(targets))
@@ -226,7 +231,7 @@ def constant_size_population():
     a = Population()
     division = []
 
-    while True:
+    for my_step in xrange(end_step):
         a.step()
         for o in range(pop_size):
     ##        if a.population[o].biomass > 190:
@@ -260,7 +265,7 @@ def growing_descendents():
     print 'father genes: ' + str([fathers_list[0].control.node[n]['on'] for n in fathers_list[0].control.nodes()])
     print 'son genes: ' + str([descendent_list[0].control.node[n]['on'] for n in descendent_list[0].control.nodes()])
     time.sleep(100)
-    while True:
+    for my_step in xrange(end_step):
         list_step(a, descendent_list)
         list_step(a, fathers_list)
         for o in range(len(descendent_list)):
@@ -285,13 +290,13 @@ def constant_size_environment_random():
         environ_list.append([(1 == rndm.randint(0,1)) for i in range(food)])
 
     print 'environment!'
-    fobj = open('environment.txt', 'a')
+    fobj = open(base_path+'environment.txt', 'a')
     fobj.write('environ_list: ' + str(environ_list))
     fobj.close()
         
     MetNet = MetabolicNetwork(met, reac, food, targets, environ_list)
     
-    fobj = open('MetNet.txt', 'a')
+    fobj = open(base_path+'MetNet.txt', 'a')
     fobj.write('Metabolic Network' + str(MetNet.edges()) + '\n\n' + str(MetNet.edge))
     fobj.close()
  
@@ -302,7 +307,7 @@ def constant_size_environment_random():
 
     media_idades_reprod = []
 
-    while True:
+    for my_step in xrange(end_step):
         a.step()
         
 
@@ -323,7 +328,7 @@ def constant_size_environment_random():
         if a.time%ta == 0:
             media_idades_reprod.append(calculamedia([a.population[ind].mother_record for ind in range(pop_size)]))
             print 'media_idades'
-            fobj = open('media_idades.txt', 'w')
+            fobj = open(base_path+'media_idades.txt', 'w')
             fobj.write('media_idades_reprod:')
             fobj.write(str(media_idades_reprod) + '\n\n')
             fobj.close()
@@ -341,13 +346,13 @@ def constant_size_environment_periodic():
     environ_list = [[True]*(food/2) + [False]*(food - food/2),[False]*(food/2) + [True]*(food - food/2)]
 
     print 'environment!'
-    fobj = open('environment.txt', 'a')
+    fobj = open(base_path+'environment.txt', 'a')
     fobj.write('environ_list: ' + str(environ_list))
     fobj.close()
         
     MetNet = MetabolicNetwork(met, reac, food, targets, environ_list)
 
-    fobj = open('MetNet.txt', 'a')
+    fobj = open(base_path+'MetNet.txt', 'a')
     fobj.write('Metabolic Network' + str(MetNet.edges()) + '\n\n' + str(MetNet.edge))
     fobj.close()
  
@@ -359,7 +364,7 @@ def constant_size_environment_periodic():
 
     media_idades_reprod = []
 
-    while True:
+    for my_step in xrange(end_step):
         a.step()
         
 
@@ -380,7 +385,7 @@ def constant_size_environment_periodic():
         if a.time%ta == 0:
             media_idades_reprod.append(calculamedia([a.population[ind].mother_record for ind in range(pop_size)]))
             print 'media_idades'
-            fobj = open('media_idades.txt', 'w')
+            fobj = open(base_path+'media_idades.txt', 'w')
             fobj.write('media_idades_reprod:')
             fobj.write(str(media_idades_reprod) + '\n\n')
             fobj.close()
@@ -398,13 +403,13 @@ def constant_size_environment_periodic_3():
     environ_list = [[True]*(food/3) + [False]*(food - food/3),[False]*(food/3) + [True]*(food/3) + [False]*(food - 2*(food/3)), [False]*(2*(food/3))+ [True]*(food - 2*(food/3))]
     
     print 'environment!'
-    fobj = open('environment.txt', 'a')
+    fobj = open(base_path+'environment.txt', 'a')
     fobj.write('environ_list: ' + str(environ_list))
     fobj.close()
         
     MetNet = MetabolicNetwork(met, reac, food, targets, environ_list)
 
-    fobj = open('MetNet.txt', 'a')
+    fobj = open(base_path+'MetNet.txt', 'a')
     fobj.write('Metabolic Network' + str(MetNet.edges()) + '\n\n' + str(MetNet.edge))
     fobj.close()
  
@@ -416,7 +421,7 @@ def constant_size_environment_periodic_3():
 
     media_idades_reprod = []
 
-    while True:
+    for my_step in xrange(end_step):
         a.step()
         
 
@@ -437,7 +442,7 @@ def constant_size_environment_periodic_3():
         if a.time%ta == 0:
             media_idades_reprod.append(calculamedia([a.population[ind].mother_record for ind in range(pop_size)]))
             print 'media_idades'
-            fobj = open('media_idades.txt', 'w')
+            fobj = open(base_path+'media_idades.txt', 'w')
             fobj.write('media_idades_reprod:')
             fobj.write(str(media_idades_reprod) + '\n\n')
             fobj.close()
@@ -453,13 +458,13 @@ def constant_size_environment_constant():
     environ_list = [[True]*food]
 
     print 'environment!'
-    fobj = open('environment.txt', 'a')
+    fobj = open(base_path+'environment.txt', 'a')
     fobj.write('environ_list: ' + str(environ_list))
     fobj.close()
         
-    MetNet = MetabolicNetwork(met, reac, food, targets, environ_list)
+    MetNet = MetabolicNetwork(met, reac, food, targets, difficult or environ_list)
 
-    fobj = open('MetNet.txt', 'a')
+    fobj = open(base_path+'MetNet.txt', 'a')
     fobj.write('Metabolic Network' + str(MetNet.edges()) + '\n\n' + str(MetNet.edge))
     fobj.close()
  
@@ -469,7 +474,7 @@ def constant_size_environment_constant():
 
     media_idades_reprod = []
 
-    while True:
+    for my_step in xrange(end_step):
         a.step()
         
 
@@ -483,16 +488,45 @@ def constant_size_environment_constant():
         if a.time%ta == 0:
             media_idades_reprod.append(calculamedia([a.population[ind].mother_record for ind in range(pop_size)]))
             print 'media_idades'
-            fobj = open('media_idades.txt', 'w')
+            fobj = open(base_path+'media_idades.txt', 'w')
             fobj.write('media_idades_reprod:')
             fobj.write(str(media_idades_reprod) + '\n\n')
             fobj.close()
         
 
+end_step = 3
+
+print ('executing from '+sys.argv[1])
+execution = open(sys.argv[1])
+
+simulation_n = 0
+while True:  
+  execution.seek(0)
+  for line in execution:
+    args = line.split()
+
+    print ('executing simulation '+str(simulation_n), args[0], 'root path is', 
+    args[1], 'mutation rate is', args[2])
+    
+    rate = float(args[2])
+
+    difficult = None
+    if len(args) > 3:
+      difficult = args[3]
+      
+    base_path = args[1]+str(simulation_n)+'/'
+    
+    if not os.path.exists(base_path):
+      os.makedirs(base_path)
+    exec(args[0])
+  simulation_n += 1
+  
+print '...Done. Ciao!'
+  
 ##monitormutation()
 ##constant_size_population()
 ##growing_descendents()
 ##constant_size_environment_random()
 ##constant_size_environment_periodic()
-constant_size_environment_periodic_3()
+##constant_size_environment_periodic_3()
 ##constant_size_environment_constant()
