@@ -20,13 +20,13 @@ class MetabolicNetwork(nx.DiGraph):
     #fazer uma versao depois com as reacoes liga/desliga fluindo materia
     #(sem precisar que o path esteja inteiro aberto ao mesmo tempo)
     
-    def __init__(self, metabolites, reactions, food, targets, env_list = None):
+    def __init__(self, env_list = None):
         nx.DiGraph.__init__(self)
         self.number_metabolites = metabolites
         self.number_reactions = reactions
         self.number_food = food
         self.number_targets = targets
-        if targets>metabolites:
+        if targets > metabolites:
             raise TargetException('The number of targets cannot exceed the number of metabolites!')
         if food < 1:
             raise FoodException('There are no food molecules!')
@@ -84,60 +84,16 @@ class MetabolicNetwork(nx.DiGraph):
         for react in range(17):
             self.add_node(35 + react,{'Type':'R', 'on': False})
 
-        self.add_edge(0, 35, {'weight':rndm.randint(1,5)})
-        self.add_edge(1, 35, {'weight':rndm.randint(1,5)})
-        self.add_edge(2, 36, {'weight':rndm.randint(1,5)})
-        self.add_edge(3, 36, {'weight':rndm.randint(1,5)})
-        self.add_edge(4, 37, {'weight':rndm.randint(1,5)})
-        self.add_edge(5, 37, {'weight':rndm.randint(1,5)})
-        self.add_edge(6, 38, {'weight':rndm.randint(1,5)})
-        self.add_edge(7, 38, {'weight':rndm.randint(1,5)})
-        self.add_edge(8, 39, {'weight':rndm.randint(1,5)})
-        self.add_edge(9, 39, {'weight':rndm.randint(1,5)})
-        self.add_edge(10, 46, {'weight':rndm.randint(1,5)})
-        self.add_edge(11, 46, {'weight':rndm.randint(1,5)})
-        self.add_edge(12, 40, {'weight':rndm.randint(1,5)})
-        self.add_edge(13, 40, {'weight':rndm.randint(1,5)})
-        self.add_edge(14, 41, {'weight':rndm.randint(1,5)})
-        self.add_edge(15, 41, {'weight':rndm.randint(1,5)})
-        self.add_edge(16, 42, {'weight':rndm.randint(1,5)})
-        self.add_edge(17, 42, {'weight':rndm.randint(1,5)})
-        self.add_edge(18, 43, {'weight':rndm.randint(1,5)})
-        self.add_edge(19, 43, {'weight':rndm.randint(1,5)})
-        self.add_edge(21, 44, {'weight':rndm.randint(1,5)})
-        self.add_edge(22, 49, {'weight':rndm.randint(1,5)})
-        self.add_edge(23, 45, {'weight':rndm.randint(1,5)})
-        self.add_edge(24, 45, {'weight':rndm.randint(1,5)})
-        self.add_edge(25, 47, {'weight':rndm.randint(1,5)})
-        self.add_edge(26, 47, {'weight':rndm.randint(1,5)})
-        self.add_edge(27, 48, {'weight':rndm.randint(1,5)})
-        self.add_edge(28, 48, {'weight':rndm.randint(1,5)})
-        self.add_edge(29, 44, {'weight':rndm.randint(1,5)})
-        self.add_edge(30, 49, {'weight':rndm.randint(1,5)})
-        self.add_edge(31, 50, {'weight':rndm.randint(1,5)})
-        self.add_edge(32, 50, {'weight':rndm.randint(1,5)})
-        self.add_edge(33, 51, {'weight':rndm.randint(1,5)})
-        self.add_edge(34, 51, {'weight':rndm.randint(1,5)})
-        self.add_edge(35, 29, {'weight':rndm.randint(1,5)})
-        self.add_edge(36, 21, {'weight':rndm.randint(1,5)})
-        self.add_edge(37, 22, {'weight':rndm.randint(1,5)})
-        self.add_edge(38, 23, {'weight':rndm.randint(1,5)})
-        self.add_edge(39, 24, {'weight':rndm.randint(1,5)})
-        self.add_edge(40, 25, {'weight':rndm.randint(1,5)})
-        self.add_edge(41, 26, {'weight':rndm.randint(1,5)})
-        self.add_edge(42, 27, {'weight':rndm.randint(1,5)})
-        self.add_edge(43, 28, {'weight':rndm.randint(1,5)})
-        self.add_edge(44, 30, {'weight':rndm.randint(1,5)})
-        self.add_edge(45, 31, {'weight':rndm.randint(1,5)})
-        self.add_edge(46, 32, {'weight':rndm.randint(1,5)})
-        self.add_edge(47, 33, {'weight':rndm.randint(1,5)})
-        self.add_edge(48, 34, {'weight':rndm.randint(1,5)})
-        self.add_edge(49, 20, {'weight':rndm.randint(1,5)})
-        self.add_edge(50, 20, {'weight':rndm.randint(1,5)})
-        self.add_edge(51, 20, {'weight':rndm.randint(1,5)})
-        
-                
-       
+        edges = [ (0, 35),(1, 35),(2, 36),(3, 36),(4, 37),(5, 37),(6, 38),\
+                  (7, 38),(8, 39),(9, 39),(10, 46),(11, 46),(12, 40),(13, 40),\
+                  (14, 41),(15, 41),(16, 42),(17, 42),(18, 43),(19, 43),(21, 44),\
+                  (22, 49),(23, 45),(24, 45),(25, 47),(26, 47),(27, 48),(28, 48),\
+                  (29, 44),(30, 49),(31, 50),(32, 50),(33, 51),(34, 51),(35, 29),\
+                  (36, 21),(37, 22),(38, 23),(39, 24),(40, 25),(41, 26),(42, 27),\
+                  (43, 28),(44, 30),(45, 31),(46, 32),(47, 33),(48, 34),(49, 20),\
+                  (50, 20),(51, 20)]
+        for e in edges:
+          self.add_edge(e[0], e[1], {'weight':rndm.randint(1,5)})
         
     def generate_random(self):
         #gera o digrafo bipartido, com metabolitos e reacoes.

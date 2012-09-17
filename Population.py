@@ -12,25 +12,6 @@ from Control import Control
 from Organism import Organism
 from copy import deepcopy
 
-food = 20
-targets = 1
-met = 35
-reac = 17
-gen = 17
-p = 0.2
-pop_size = 100
-division_threshold = 50
-record_size = 10
-rate = 0.0001
-number_environments = 3
-
-peso = 1.0/3
-
-ta = 100
-tb = 10000
-
-MetNet = None
-
 #O ambiente eh gerado antes de mais nada!!!
 #Aqui tem que ser decidido sobre as condicoes.
 
@@ -288,8 +269,6 @@ def constant_size_environment_periodic():
 
     for my_step in xrange(end_step):
         a.step()
-        
-
             
         if a.time%envchg_period == 0:
             chg = True
@@ -313,8 +292,6 @@ def constant_size_environment_periodic():
             fobj.close()
         
         chg = False
-
-
             
 def constant_size_environment_constant():
 
@@ -329,7 +306,7 @@ def constant_size_environment_constant():
     fobj.write('environ_list: ' + str(environ_list))
     fobj.close()
         
-    MetNet = MetabolicNetwork(met, reac, food, targets, difficult or environ_list)
+    MetNet = MetabolicNetwork(difficult or environ_list)
 
     fobj = open(base_path+'MetNet.txt', 'a')
     fobj.write('Metabolic Network' + str(MetNet.edges()) + '\n\n' + str(MetNet.edge))
@@ -361,38 +338,54 @@ def constant_size_environment_constant():
             fobj.close()
         
 
-end_step = 1000000
+if __name__ == '__main__':
 
-print ('executing from '+sys.argv[1])
-execution = open(sys.argv[1])
+  food = 20
+  targets = 1
+  metabolites = 35
+  reactions = 17
+  genes = 17
+  p = 0.2
+  population_size = 100
+  division_threshold = 50
+  record_size = 10
+  rate = 0.0001
+  number_environments = 3
 
-simulation_n = 0
-while True:  
-  execution.seek(0)
-  for line in execution:
-    args = line.split()
+  peso = 1.0/3
 
-    print ('executing simulation '+str(simulation_n), args[0], 'root path is', 
-    args[1], 'mutation rate is', args[2])
-    
-    rate = float(args[2])
-    print 'rate: ' + str(rate)
+  ta = 100
+  tb = 10000
 
-    difficult = None
-    if len(args) > 3:
-      difficult = args[3]
+  MetNet = None
+
+  end_step = 1000000
+
+  print ('executing from '+sys.argv[1])
+  execution = open(sys.argv[1])
+
+  simulation_n = 0
+  while True:
+    execution.seek(0)
+    for line in execution:
+      args = line.split()
+
+      print ('executing simulation '+str(simulation_n), args[0], 'root path is', 
+      args[1], 'mutation rate is', args[2])
       
-    base_path = args[1]+str(simulation_n)+'/'
-    
-    if not os.path.exists(base_path):
-      os.makedirs(base_path)
-    exec(args[0])
-  simulation_n += 1
-  
-print '...Done. Ciao!'
-  
+      rate = float(args[2])
+      print 'rate: ' + str(rate)
 
-##constant_size_environment_random()
-##constant_size_environment_periodic()
-##constant_size_environment_periodic_3()
-##constant_size_environment_constant()
+      difficult = None
+      if len(args) > 3:
+        difficult = args[3]
+        
+      base_path = args[1]+str(simulation_n)+'/'
+      
+      if not os.path.exists(base_path):
+        os.makedirs(base_path)
+      exec(args[0])
+    simulation_n += 1
+    
+  print '...Done. Ciao!'
+  
