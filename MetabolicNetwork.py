@@ -5,6 +5,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import random as rndm
 import time
+from Constants import Constants
 
 class TargetException(Exception):
     pass
@@ -22,15 +23,15 @@ class MetabolicNetwork(nx.DiGraph):
     
     def __init__(self, env_list = None):
         nx.DiGraph.__init__(self)
-        self.number_metabolites = metabolites
-        self.number_reactions = reactions
-        self.number_food = food
-        self.number_targets = targets
-        if targets > metabolites:
+        self.number_metabolites = Constants.metabolites
+        self.number_reactions = Constants.reactions
+        self.number_food = Constants.food
+        self.number_targets = Constants.targets
+        if self.number_targets > self.number_metabolites:
             raise TargetException('The number of targets cannot exceed the number of metabolites!')
-        if food < 1:
+        if self.number_food < 1:
             raise FoodException('There are no food molecules!')
-        if targets + food > metabolites:
+        if self.number_targets + self.number_food > self.number_metabolites:
             raise MetaboliteNumberException('There are more food and target molecules than possible!')
 
 
@@ -43,7 +44,7 @@ class MetabolicNetwork(nx.DiGraph):
 
             print 'Solution found!'
             print 'target1:' + str(self.number_food)
-            print 'number of targets: ' + str(targets) 
+            print 'number of targets: ' + str(self.number_targets) 
             
             self.target_amount = self.path_to_target() ##Acho que nao ta sendo usado
             self.turn_off_met()
@@ -68,7 +69,7 @@ class MetabolicNetwork(nx.DiGraph):
 
             print 'Solution multiple environment found!'
             print 'target1:' + str(self.number_food)
-            print 'number of targets: ' + str(targets) 
+            print 'number of targets: ' + str(self.number_targets) 
             
             self.target_amount = self.path_to_target() ##Acho que nao ta sendo usado
             self.turn_off_met()
@@ -96,7 +97,8 @@ class MetabolicNetwork(nx.DiGraph):
           self.add_edge(e[0], e[1], {'weight':rndm.randint(1,5)})
         
     def generate_random(self):
-        #gera o digrafo bipartido, com metabolitos e reacoes.
+        #gera o digrafo bipartido, com metabolitos e reacoes.dogs kissing
+
         #pos = {}
         for food in xrange(self.number_food):
             self.add_node(food, {'Type':'M','Food': True ,'Target': False, 'Flowing': True})
@@ -200,5 +202,4 @@ class MetabolicNetwork(nx.DiGraph):
                 self.node[m]['Flowing'] = False
 
 
-##MetNet = MetabolicNetwork(50, 80, 20, 3, [[0]*10 + [1]*10, [1]*10 + [0]*10])
 

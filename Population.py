@@ -10,6 +10,7 @@ import time
 from MetabolicNetwork import MetabolicNetwork
 from Control import Control
 from Organism import Organism
+from Constants import Constants
 from copy import deepcopy
 
 #O ambiente eh gerado antes de mais nada!!!
@@ -22,9 +23,9 @@ class Population():
         self.time = 0
         self.records = ['a']*record_size
         self.worst_record = 'a'
-        self.population = [None]*pop_size
-        for o in range(pop_size):
-            self.population[o] = Organism(MetNet, met, reac, food, targets, gen, p, True)
+        self.population = [None]*population_size
+        for o in range(population_size):
+            self.population[o] = Organism(MetNet, inicial = True)
             self.population[o].species = o
         
     def step(self):
@@ -34,13 +35,13 @@ class Population():
         if self.time%tb == 0:
             self.genometofile()
             
-        for o in range(pop_size):
+        for o in range(population_size):
             genestr = self.population[o].control.change_state()
             self.population[o].chemistry.update_reactions(self.population[o].control.switch_dict)
             enzime_fraction = 0
             for j in range(len(genestr)- self.population[o].control.number_food_actual):
                 enzime_fraction+=genestr[j + self.population[o].control.number_food_actual]
-            enzime_fraction = peso*float(enzime_fraction)/reac
+            enzime_fraction = peso*float(enzime_fraction)/reactions
             self.population[o].biomass = self.population[o].biomass + self.population[o].chemistry.path_to_target() - enzime_fraction
             self.population[o].age += 1
         self.time += 1
@@ -89,12 +90,12 @@ class Population():
         for d in popping_list:
             self.population.pop(d + decr)
             decr -= 1
-        fobj.write('\ndivision ages:\n' + str([self.population[ind].record for ind in range(pop_size)]))
-        fobj.write('\nmothers ages:\n' + str([self.population[ind].mother_record for ind in range(pop_size)]) + '\n\n')
+        fobj.write('\ndivision ages:\n' + str([self.population[ind].record for ind in range(population_size)]))
+        fobj.write('\nmothers ages:\n' + str([self.population[ind].mother_record for ind in range(population_size)]) + '\n\n')
         fobj.close()
 
         fobj = open(base_path+'species.txt', 'a')
-        fobj.write(str([self.population[ind].species for ind in range(pop_size)]) + '\n')
+        fobj.write(str([self.population[ind].species for ind in range(population_size)]) + '\n')
         fobj.close()
 
     def genometofile(self):
@@ -102,7 +103,7 @@ class Population():
         fobj.write('timestep: ' + str(self.time) + '\n')
         r = 'a'
         ix = 0
-        for i in range(pop_size):
+        for i in range(population_size):
             if self.population[i].record < r:
                 r = self.population[i].record
                 ix = i
@@ -120,7 +121,7 @@ def list_step(population, lista_o):
         enzime_fraction = 0
         for j in range(len(genestr)- lista_o[o].control.number_food_actual):
             enzime_fraction+=genestr[j + lista_o[o].control.number_food_actual]
-        enzime_fraction = float(enzime_fraction)/reac
+        enzime_fraction = float(enzime_fraction)/reactions
         lista_o[o].biomass = lista_o[o].biomass + lista_o[o].chemistry.path_to_target() - enzime_fraction
         lista_o[o].age += 1
     population.time += 1
@@ -160,11 +161,11 @@ def headertofile(string):
     fobj.write(string)
     fobj.write('\n\n' + 'food = ' + str(food))
     fobj.write('\n' + 'targets = ' + str(targets))
-    fobj.write('\n' + 'met = ' + str(met))
-    fobj.write('\n' + 'reac = ' + str(reac))
-    fobj.write('\n' + 'gen = ' + str(gen))
+    fobj.write('\n' + 'metabolites = ' + str(metabolites))
+    fobj.write('\n' + 'reactions = ' + str(reactions))
+    fobj.write('\n' + 'genes = ' + str(genes))
     fobj.write('\n' + 'p = ' + str(p))
-    fobj.write('\n' + 'pop_size = ' + str(pop_size))
+    fobj.write('\n' + 'population_size = ' + str(population_size))
     fobj.write('\n' + 'division_threshold = ' + str(division_threshold))
     fobj.write('\n' + 'record_size = ' + str(record_size))
     fobj.write('\n' + 'rate = ' + str(rate))
@@ -192,7 +193,7 @@ def constant_size_environment_random():
     fobj.write('environ_list: ' + str(environ_list))
     fobj.close()
         
-    MetNet = MetabolicNetwork(met, reac, food, targets, difficult or environ_list)
+    MetNet = MetabolicNetwork(difficult or environ_list)
     
     fobj = open(base_path+'MetNet.txt', 'a')
     fobj.write('Metabolic Network' + str(MetNet.edges()) + '\n\n' + str(MetNet.edge))
@@ -213,7 +214,7 @@ def constant_size_environment_random():
         if rndm.random() < env_change_rate:
             chg = True
             env_ind = rndm.randint(0,len(environ_list) - 1)
-        for o in range(pop_size):
+        for o in range(population_size):
             if chg:
                 a.population[o].change_environment_org(environ_list[env_ind])
                 
@@ -224,7 +225,7 @@ def constant_size_environment_random():
             division = []
 
         if a.time%ta == 0:
-            media_idades_reprod.append(calculamedia([a.population[ind].mother_record for ind in range(pop_size)]))
+            media_idades_reprod.append(calculamedia([a.population[ind].mother_record for ind in range(population_size)]))
             print 'media_idades'
             fobj = open(base_path+'media_idades.txt', 'w')
             fobj.write('media_idades_reprod:')
@@ -253,7 +254,7 @@ def constant_size_environment_periodic():
     fobj.write('environ_list: ' + str(environ_list))
     fobj.close()
         
-    MetNet = MetabolicNetwork(met, reac, food, targets, difficult or environ_list)
+    MetNet = MetabolicNetwork(difficult or environ_list)
 
     fobj = open(base_path+'MetNet.txt', 'a')
     fobj.write('Metabolic Network' + str(MetNet.edges()) + '\n\n' + str(MetNet.edge))
@@ -273,7 +274,7 @@ def constant_size_environment_periodic():
         if a.time%envchg_period == 0:
             chg = True
             env_ind = (env_ind + 1)%subenv
-        for o in range(pop_size):
+        for o in range(population_size):
             if chg:
                 a.population[o].change_environment_org(environ_list[env_ind])
                 
@@ -284,7 +285,7 @@ def constant_size_environment_periodic():
             division = []
 
         if a.time%ta == 0:
-            media_idades_reprod.append(calculamedia([a.population[ind].mother_record for ind in range(pop_size)]))
+            media_idades_reprod.append(calculamedia([a.population[ind].mother_record for ind in range(population_size)]))
             print 'media_idades'
             fobj = open(base_path+'media_idades.txt', 'w')
             fobj.write('media_idades_reprod:')
@@ -322,7 +323,7 @@ def constant_size_environment_constant():
         a.step()
         
 
-        for o in range(pop_size):                
+        for o in range(population_size):                
             if a.population[o].biomass > division_threshold:
                 division.append(o)
         if len(division) > 0:
@@ -330,7 +331,7 @@ def constant_size_environment_constant():
             division = []
 
         if a.time%ta == 0:
-            media_idades_reprod.append(calculamedia([a.population[ind].mother_record for ind in range(pop_size)]))
+            media_idades_reprod.append(calculamedia([a.population[ind].mother_record for ind in range(population_size)]))
             print 'media_idades'
             fobj = open(base_path+'media_idades.txt', 'w')
             fobj.write('media_idades_reprod:')
@@ -340,52 +341,49 @@ def constant_size_environment_constant():
 
 if __name__ == '__main__':
 
-  food = 20
-  targets = 1
-  metabolites = 35
-  reactions = 17
-  genes = 17
-  p = 0.2
-  population_size = 100
-  division_threshold = 50
-  record_size = 10
-  rate = 0.0001
-  number_environments = 3
+    food = Constants.food
+    targets = Constants.targets
+    metabolites = Constants.metabolites
+    reactions = Constants.reactions
+    genes = Constants.genes
+    p = Constants.p
+    population_size = Constants.population_size
+    division_threshold = Constants.division_threshold
+    record_size = Constants.record_size
+    rate = Constants.rate
+    number_environments = Constants.number_environments
+    peso = Constants.peso
+    ta = Constants.ta
+    tb = Constants.tb
+    end_step = Constants.end_step
 
-  peso = 1.0/3
+    MetNet = None    
 
-  ta = 100
-  tb = 10000
+    print ('executing from '+sys.argv[1])
+    execution = open(sys.argv[1])
 
-  MetNet = None
+    simulation_n = 0
+    while True:
+        execution.seek(0)
+        for line in execution:
+            args = line.split()
 
-  end_step = 1000000
-
-  print ('executing from '+sys.argv[1])
-  execution = open(sys.argv[1])
-
-  simulation_n = 0
-  while True:
-    execution.seek(0)
-    for line in execution:
-      args = line.split()
-
-      print ('executing simulation '+str(simulation_n), args[0], 'root path is', 
-      args[1], 'mutation rate is', args[2])
+            print ('executing simulation '+str(simulation_n), args[0], 'root path is', 
+            args[1], 'mutation rate is', args[2])
       
-      rate = float(args[2])
-      print 'rate: ' + str(rate)
+            rate = float(args[2])
+            print 'rate: ' + str(rate)
 
-      difficult = None
-      if len(args) > 3:
-        difficult = args[3]
+            difficult = None
+            if len(args) > 3:
+                difficult = args[3]
         
-      base_path = args[1]+str(simulation_n)+'/'
+            base_path = args[1]+str(simulation_n)+'/'
       
-      if not os.path.exists(base_path):
-        os.makedirs(base_path)
-      exec(args[0])
-    simulation_n += 1
+            if not os.path.exists(base_path):
+                os.makedirs(base_path)
+            exec(args[0])
+        simulation_n += 1
     
-  print '...Done. Ciao!'
+    print '...Done. Ciao!'
   

@@ -5,6 +5,7 @@ import numpy
 import time
 from MetabolicNetwork import MetabolicNetwork
 from Control import Control
+from Constants import Constants
 from copy import deepcopy
 
 class GeneNumberException(Exception):
@@ -12,28 +13,23 @@ class GeneNumberException(Exception):
 
 
 class Organism(nx.DiGraph):
-    def __init__(self, MetNet, met, reac, number_food, targets, gen, p, inicial = False, control = None):
-        #quais sao as caracteristicas em comum entre um organismo gerado from scratch
-        #e um organismo proveninente de uma mutacao? Isso tem que estar no __init__
-        
-        #self.chemistry = MetNet
-
+    def __init__(self, MetNet, inicial = False, control = None):
         self.age = 0
         self.record = 'a'
         self.mother_record = 'a'
         self.species = 'a'
-
-        self.number_targets = targets
-        food_list = range(number_food)
+        self.metabolites = Constants.metabolites
+        self.number_targets = Constants.targets
+        food_list = range(Constants.food)
         
         if inicial: #verifica se a populacao eh inicial
-            react_list = [x + met for x in range(MetNet.number_reactions)]
+            react_list = [x + self.metabolites for x in range(Constants.reactions)]
              
 
-            if gen > len(react_list):
+            if Constants.genes > len(react_list):
                 raise GeneNumberException('There are more genes than reactions to be controlled!')
 
-            genes_list = food_list + sorted(rndm.sample(react_list, gen))
+            genes_list = food_list + sorted(rndm.sample(react_list, Constants.genes))
 
             #talvez fosse util ter um dicionario que redireciona pra funcoes
             #dependendo do tipo de inicializacao - inicial ou mutacao - e
@@ -42,7 +38,7 @@ class Organism(nx.DiGraph):
             self.chemistry = self.clean_met_net(MetNet, genes_list, food_list)
 ##            print 'o dicionario inicial de chemis:'
 ##            print self.chemistry.node
-            self.control = Control(number_food, met, genes_list, p, reac, inicial)
+            self.control = Control(genes_list, inicial)
 ##            print 'dicionario inicial:'
 ##            print self.control.switch_dict
             self.chemistry.update_reactions(self.control.switch_dict)
@@ -79,9 +75,9 @@ class Organism(nx.DiGraph):
 
         DNAp = self.control.export_code()
         DNAm = mutate_DNA(DNAp, rate)
-        control_son = Control(MetNet.number_food, MetNet.number_metabolites, [], 0, MetNet.number_reactions, DNA = DNAm, mother = self.control)
+        control_son = Control(DNA = DNAm, mother = self.control)
         
-        return Organism(MetNet, MetNet.number_metabolites, MetNet.number_reactions, MetNet.number_food, MetNet.number_targets, 0, 0, inicial = False, control = control_son)
+        return Organism(MetNet, inicial = False, control = control_son)
 
 def mutate_DNA(code, rate):
     for i in range(len(code)):
