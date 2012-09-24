@@ -1,0 +1,15 @@
+minimum
+
+food = 2
+targets = 1
+metabolites = 3
+reactions = 1
+genes = 1
+p = 0.2
+population_size = 100
+division_threshold = 50
+record_size = 10
+rate = 0.0005
+number_environments = 6
+ta = 100
+tb = 10000
