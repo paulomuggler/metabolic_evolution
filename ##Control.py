@@ -73,14 +73,15 @@ class Control(nx.DiGraph):
        
 	for interm in range(self.intermediate):
 	    r = (True == rndm.randint(0,1))
-            self.add_node(interm + Constants.metabolites + Constants.reactions,  {'on': r ,'Next': r })
+            self.add_node((interm,),  {'on': r ,'Next': r })
             self.colors.append(palette[r + 0])
-
+##            if r:
+##                self.switch_dict.update({(interm,):True})
 
         pos2 = nx.circular_layout(self)
         self.pos = {}
-        for i in self.genes_list + [c + Constants.metabolites + Constants.reactions for c in range(self.intermediate)]:
-            self.pos[i] = pos2[self.nodes()[(self.genes_list + [c + Constants.metabolites + Constants.reactions for c in range(self.intermediate)]).index(i)]]
+        for i in self.genes_list + [(c,) for c in range(self.intermediate)]:
+            self.pos[i] = pos2[self.nodes()[(self.genes_list + [(c,) for c in range(self.intermediate)]).index(i)]]
 
         self.draw_BN(self.pos, self.genes_list)
 
@@ -144,11 +145,10 @@ class Control(nx.DiGraph):
             self.node[self.genes_list[n]]['on'] = self.node[self.genes_list[n]]['Next']
             self.colors[n] = palette[self.node[self.genes_list[n]]['on'] + 0]
             gene_string.append(self.node[self.genes_list[n]]['on'] + 0)
-        cint = 0
-        for inter in sorted([presinterm for presinterm in self.nodes() if presinterm in [q + Constants.reactions + Constants.metabolites for q in range(Constants.intermediate)]]):
-            self.node[inter]['on'] = self.node[inter]['Next']
-            self.colors[self.number_genes + cint] = palette[self.node[inter]['on'] + 0]
-            cint += 1
+
+        for inter in range(Constants.intermediate):
+            self.node[(inter,)]['on'] = self.node[(inter,)]['Next']
+            self.colors[self.number_genes + inter] = palette[self.node[(inter,)]['on'] + 0]
 
 
         self.draw_BN(self.pos, self.genes_list)
@@ -178,9 +178,11 @@ class Control(nx.DiGraph):
         K = self.number_food_total*pot_cn
 
         DNA = [0]*(pot_cn**2 - K)
-        for a, b in self.edges():         
-            aa = a if a in range(self.number_food_total) else a - self.number_metabolites + self.number_food_total
-            bb = b - self.number_metabolites + self.number_food_total
+        for a, b in self.edges():
+            x = a if not isinstance(a, tuple) else a[0] + self.number_metabolites + self.number_reac_total 
+            y = b if not isinstance(b, tuple) else b[0] + self.number_metabolites + self.number_reac_total           
+            aa = x if x in range(self.number_food_total) else x - self.number_metabolites + self.number_food_total
+            bb = y - self.number_metabolites + self.number_food_total
             DNA[bb*pot_cn + aa - K] = self.edge[a][b]['w']
 
         return DNA
@@ -195,6 +197,10 @@ class Control(nx.DiGraph):
             b = (index + K - a)/pot_cn
             aa = a if a in range(self.number_food_total) else a + self.number_metabolites - self.number_food_total
             bb = b + self.number_metabolites - self.number_food_total
+            if aa >= self.number_metabolites + self.number_reac_total:
+                aa = (aa - self.number_metabolites - self.number_reac_total,)
+            if bb >= self.number_metabolites + self.number_reac_total:
+                bb = (bb - self.number_metabolites - self.number_reac_total,)
             self.add_edge(aa, bb, {'w': DNA[index]})
      
 
@@ -204,33 +210,33 @@ class Control(nx.DiGraph):
             if f not in self.nodes():
                 self.add_node(f)
                 
-        self.genes_list = deepcopy([g for g in self.nodes() if g < Constants.metabolites + Constants.reactions])
+        self.genes_list = deepcopy([g for g in self.nodes() if not isinstance(g, tuple)])
         self.genes_list.sort()
         self.number_genes = len(self.genes_list)
 
         if mother is None:
-            for n in self.genes_list + sorted([presinterm for presinterm in self.nodes() if presinterm in [q + Constants.reactions + Constants.metabolites for q in range(Constants.intermediate)]]):
+            for n in self.genes_list + [(q,) for q in range(Constants.intermediate)]:
                 #print n
                 r = (True == rndm.randint(0,1))
                 self.node[n] = {'on': r or (n in range(self.number_food_total)),'Next': r or (n in range(self.number_food_total))}
-                if r and (n not in range(self.number_food_total)) and n < Constants.metabolites + Constants.reactions:
+                if r and (n not in range(self.number_food_total)) and not isinstance(n, tuple): # or (n in range(self.number_food_total)):
                     self.switch_dict.update({n: True})
 
                 self.colors.append(palette[self.node[n]['on'] + 0])
 
 
         else:
-            for n in self.genes_list + sorted([presinterm for presinterm in self.nodes() if presinterm in [q + Constants.reactions + Constants.metabolites for q in range(Constants.intermediate)]]):
+            for n in self.genes_list + [(q,) for q in range(Constants.intermediate)]:
                 #print n
                 if n in mother.nodes():
                     self.node[n] = {'on': mother.node[n]['on'],'Next': mother.node[n]['on']}
-                    if mother.node[n]['on'] and (n not in range(self.number_food_total)) and n < Constants.metabolites + Constants.reactions: 
+                    if mother.node[n]['on'] and (n not in range(self.number_food_total)) and not isinstance(n, tuple): 
                         self.switch_dict.update({n: True})
 
                 else:
                     r = (True == rndm.randint(0,1))
                     self.node[n] = {'on': r,'Next': r}
-                    if r and (n not in range(self.number_food_total)) and n < Constants.metabolites + Constants.reactions:
+                    if r and (n not in range(self.number_food_total)) and not isinstance(n, tuple): # or (n in range(self.number_food_total)):
                         self.switch_dict.update({n: True})
 
                 self.colors.append(palette[self.node[n]['on'] + 0])

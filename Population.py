@@ -192,6 +192,8 @@ def constant_size_environment_random():
     fobj = open(base_path+'environment.txt', 'a')
     fobj.write('environ_list: ' + str(environ_list))
     fobj.close()
+
+
         
     MetNet = MetabolicNetwork(difficult or environ_list)
     
@@ -206,10 +208,9 @@ def constant_size_environment_random():
 
     media_idades_reprod = []
 
+
     for my_step in xrange(end_step):
         a.step()
-        
-
             
         if rndm.random() < env_change_rate:
             chg = True
@@ -254,6 +255,9 @@ def constant_size_environment_periodic():
     fobj.write('environ_list: ' + str(environ_list))
     fobj.close()
         
+
+
+
     MetNet = MetabolicNetwork(difficult or environ_list)
 
     fobj = open(base_path+'MetNet.txt', 'a')
@@ -307,6 +311,7 @@ def constant_size_environment_constant():
     fobj.write('environ_list: ' + str(environ_list))
     fobj.close()
         
+
     MetNet = MetabolicNetwork(difficult or environ_list)
 
     fobj = open(base_path+'MetNet.txt', 'a')
@@ -337,7 +342,76 @@ def constant_size_environment_constant():
             fobj.write('media_idades_reprod:')
             fobj.write(str(media_idades_reprod) + '\n\n')
             fobj.close()
-        
+
+def constant_size(descriptive_string, environ_list, environ_change_method, period):
+     
+    headertofile(descriptive_string)
+    global MetNet
+
+    print 'environment!'
+    fobj = open(base_path+'environment.txt', 'a')
+    fobj.write('environ_list: ' + str(environ_list))
+    fobj.close()
+
+    MetNet = MetabolicNetwork(descriptive_string)
+
+    fobj = open(base_path+'MetNet.txt', 'a')
+    fobj.write('Metabolic Network' + str(MetNet.edges()) + '\n\n' + str(MetNet.edge))
+    fobj.close()
+ 
+
+    a = Population()
+    division = []
+    env_change_rate = 0.01
+    chg = False
+    env_ind = 0
+
+    media_idades_reprod = []
+
+    for my_step in xrange(end_step):
+        a.step()
+
+	chg, env_ind = environ_change_method(env_ind, period, a)
+
+        for o in range(population_size):
+            if chg:
+                a.population[o].change_environment_org(environ_list[env_ind])
+                
+            if a.population[o].biomass > division_threshold:
+                division.append(o)
+        if len(division) > 0:
+            a.divide(division, rate, MetNet)
+            division = []
+
+        if a.time%ta == 0:
+            media_idades_reprod.append(calculamedia([a.population[ind].mother_record for ind in range(population_size)]))
+            print 'media_idades'
+            fobj = open(base_path+'media_idades.txt', 'w')
+            fobj.write('media_idades_reprod:')
+            fobj.write(str(media_idades_reprod) + '\n\n')
+            fobj.close()
+
+        chg = False
+
+def constant_method(env_ind, period, population):
+    return (False, 0)
+
+def periodic_method(env_ind, period, population):
+    if population.time % Constants.envchg_period == 0:
+        return (True, (env_ind + 1)%period)
+    return (False, env_ind)
+
+def random_method(env_ind, period, population):
+    if rndm.random() < env_change_rate:
+        return (True, rndm.randint(0, period - 1))    
+    return (False, env_ind)
+
+def periodic_asymmetric__method(env_ind, period, population):
+    if population.time % Constants.envchg_period == 0:
+        return (True, (env_ind + 1)%period)
+    return (False, env_ind)
+
+
 
 if __name__ == '__main__':
 
@@ -366,6 +440,8 @@ if __name__ == '__main__':
     while True:
         execution.seek(0)
         for line in execution:
+            if line[0] == '#':
+                continue
             args = line.split()
 
             print ('executing simulation '+str(simulation_n), args[0], 'root path is', 

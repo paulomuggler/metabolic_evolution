@@ -1,0 +1,6 @@
+constant_size('minimum',Constants.env_dict['minimum2'],periodic_method,6)	organised/minimum2/periodic/mutation/	0.0005	minimum
+#constant_size()	organised/minimum_difficult/periodic/mutation/		0.0005		minimum_difficult
+#constant_size()	organised/difficult/constant/mutation/			0.0005		difficult
+#constant_size()	organised/minimum/random/no_mutation/			0		minimum
+#constant_size()	organised/minimum_difficult/periodic/no_mutation/	0		minimum_difficult
+#constant_size()	organised/difficult/constant/no_mutation/		0		difficult

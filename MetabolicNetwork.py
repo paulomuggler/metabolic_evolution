@@ -53,7 +53,17 @@ class MetabolicNetwork(nx.DiGraph):
             self.generate_difficult()
             self.target_amount = self.path_to_target()
             self.turn_off_met()
+        
+        elif env_list == 'minimum':
+           self.generate_minimum()
+           self.target_amount = self.path_to_target()
+           self.turn_off_met()
 
+        elif env_list == 'minimum_difficult':
+           self.generate_minimum_difficult()
+           self.target_amount = self.path_to_target()
+           self.turn_off_met()
+        
         else:
             self.generate_random()
             flag = False
@@ -95,7 +105,30 @@ class MetabolicNetwork(nx.DiGraph):
                   (50, 20),(51, 20)]
         for e in edges:
           self.add_edge(e[0], e[1], {'weight':rndm.randint(1,5)})
-        
+
+    def generate_minimum(self):
+        for f in range(2):
+            self.add_node(f, {'Type':'M','Food': True ,'Target': False, 'Flowing': True})
+        self.add_node(2, {'Type':'M','Food': False ,'Target': True, 'Flowing': False})
+        self.add_node(3, {'Type':'R', 'on': False})
+
+        edges = [(0,3),(1,3),(3,2)]
+
+        for e in edges:
+          self.add_edge(e[0], e[1], {'weight':rndm.randint(1,5)})        
+
+    def generate_minimum_difficult(self):
+        for f in range(6):
+            self.add_node(f, {'Type':'M','Food': True ,'Target': False, 'Flowing': True})
+        self.add_node(6, {'Type':'M','Food': False ,'Target': True, 'Flowing': False})
+        for r in range(3):
+            self.add_node(7 + r, {'Type':'R', 'on': False})
+
+        edges = [(0,7),(1,7),(2,8),(3,8),(4,9),(5,9),(7,6),(8,6),(9,6)]
+
+        for e in edges:
+          self.add_edge(e[0], e[1], {'weight':rndm.randint(1,5)})   
+
     def generate_random(self):
         #gera o digrafo bipartido, com metabolitos e reacoes.dogs kissing
 
