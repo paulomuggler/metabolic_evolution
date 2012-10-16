@@ -41,7 +41,7 @@ class Population():
             enzime_fraction = 0
             for j in range(len(genestr)- self.population[o].control.number_food_actual):
                 enzime_fraction+=genestr[j + self.population[o].control.number_food_actual]
-            enzime_fraction = peso*float(enzime_fraction)/reactions
+            enzime_fraction = peso*float(enzime_fraction)/(reactions + len(self.population[o].control.intermediate_list))
             self.population[o].biomass = self.population[o].biomass + self.population[o].chemistry.path_to_target() - enzime_fraction
             self.population[o].age += 1
         self.time += 1
@@ -121,7 +121,7 @@ def list_step(population, lista_o):
         enzime_fraction = 0
         for j in range(len(genestr)- lista_o[o].control.number_food_actual):
             enzime_fraction+=genestr[j + lista_o[o].control.number_food_actual]
-        enzime_fraction = float(enzime_fraction)/reactions
+        enzime_fraction = float(enzime_fraction)/(reactions + len(lista_o[o].control.intermediate_list))
         lista_o[o].biomass = lista_o[o].biomass + lista_o[o].chemistry.path_to_target() - enzime_fraction
         lista_o[o].age += 1
     population.time += 1
@@ -368,6 +368,7 @@ def constant_size(descriptive_string, environ_list, environ_change_method, perio
 
     media_idades_reprod = []
 
+
     for my_step in xrange(end_step):
         a.step()
 
@@ -390,8 +391,17 @@ def constant_size(descriptive_string, environ_list, environ_change_method, perio
             fobj.write('media_idades_reprod:')
             fobj.write(str(media_idades_reprod) + '\n\n')
             fobj.close()
+            
 
         chg = False
+
+    print 'plot'
+    fobj = open(base_path+'plot.py', 'w')
+    fobj.write('import matplotlib.pyplot as plt\n\nplt.figure()\nplt.plot(')
+    fobj.write(str(media_idades_reprod))
+    fobj.write(')\n\nplt.show()\nplt.draw()\nplt.draw()')
+    fobj.close()
+    
 
 def constant_method(env_ind, period, population):
     return (False, 0)
@@ -429,6 +439,8 @@ if __name__ == '__main__':
     peso = Constants.peso
     ta = Constants.ta
     tb = Constants.tb
+    
+
     end_step = Constants.end_step
 
     MetNet = None    
@@ -450,9 +462,9 @@ if __name__ == '__main__':
             rate = float(args[2])
             print 'rate: ' + str(rate)
 
-            difficult = None
-            if len(args) > 3:
-                difficult = args[3]
+            #difficult = None
+            #if len(args) > 3:
+            #    difficult = args[3]
         
             base_path = args[1]+str(simulation_n)+'/'
       

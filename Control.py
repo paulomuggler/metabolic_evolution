@@ -31,15 +31,15 @@ class Control(nx.DiGraph):
         
         nx.DiGraph.__init__(self)
         #Tomar cuidado se for colocar soh parte das food molecules, muitas coisas dependem disso!
-        self.number_food_total = Constants.food
-        self.number_metabolites = Constants.metabolites
-        self.number_reac_total = Constants.reactions
-        self.intermediate = Constants.intermediate
+
         
-        #SERA QUE ESSA COPIA PRECISARIA SER DEEP?
         
         self.switch_dict = {}
-        self.colors = []         
+        self.colors = []
+
+        pot_cn = (Constants.food + Constants.reactions + Constants.intermediate)
+        K = Constants.food*pot_cn
+        self.DNA_length = (pot_cn**2 - K)
        
         if inicial:
             self.p = Constants.p
@@ -48,15 +48,18 @@ class Control(nx.DiGraph):
             #cuidado! Nao existe uma verificacao
             #por chaves repetidas nessa lista!!
             
-            self.number_food_actual = len([f for f in self.genes_list if f in range(self.number_food_total)])            
+            self.number_food_actual = len([f for f in self.genes_list if f in range(Constants.food)])            
             self.number_genes = len(genes_list)
             self.generate_minimum()
+            self.density = float(self.number_genes - self.number_food_actual)/self.DNA_length
 ##            self.generate_random()
         else:
             self.genes_list = []
-            self.import_code(DNA, mother)
-            self.number_food_actual = len([f for f in self.genes_list if f in range(self.number_food_total)])
-            
+            DNAcount = self.import_code(DNA, mother)
+            self.number_food_actual = len([f for f in self.genes_list if f in range(Constants.food)])
+            self.density = float(DNAcount)/self.DNA_length
+        
+        self.intermediate_list = sorted([presinterm for presinterm in self.nodes() if presinterm in [q + Constants.reactions + Constants.metabolites for q in range(Constants.intermediate)]])
         
 
     def generate_minimum(self):
@@ -64,14 +67,14 @@ class Control(nx.DiGraph):
         #ele gera a topologia (com pesos) e ja seta os ligados/desligados iniciais.
         for gene in range(self.number_genes):
             r = (True == rndm.randint(0,1))
-            self.add_node(self.genes_list[gene],  {'on': r or (gene in range(self.number_food_total)),'Next': r or (gene in range(self.number_food_total))})
-            if gene not in range(self.number_food_total):
+            self.add_node(self.genes_list[gene],  {'on': r or (gene in range(Constants.food)),'Next': r or (gene in range(Constants.food))})
+            if gene not in range(Constants.food):
                 self.add_edge(self.genes_list[gene], self.genes_list[gene], {'w': 1.0})
-            self.colors.append(palette[(r or (gene in range(self.number_food_total))) + 0])
-            if r and (gene not in range(self.number_food_total)): #or (gene1 in range(self.number_food_total)):
+            self.colors.append(palette[(r or (gene in range(Constants.food))) + 0])
+            if r and (gene not in range(Constants.food)): #or (gene1 in range(Constants.food)):
                 self.switch_dict.update({self.genes_list[gene]:True})
        
-	for interm in range(self.intermediate):
+	for interm in range(Constants.intermediate):
 	    r = (True == rndm.randint(0,1))
             self.add_node(interm + Constants.metabolites + Constants.reactions,  {'on': r ,'Next': r })
             self.colors.append(palette[r + 0])
@@ -79,8 +82,8 @@ class Control(nx.DiGraph):
 
         pos2 = nx.circular_layout(self)
         self.pos = {}
-        for i in self.genes_list + [c + Constants.metabolites + Constants.reactions for c in range(self.intermediate)]:
-            self.pos[i] = pos2[self.nodes()[(self.genes_list + [c + Constants.metabolites + Constants.reactions for c in range(self.intermediate)]).index(i)]]
+        for i in self.genes_list + [c + Constants.metabolites + Constants.reactions for c in range(Constants.intermediate)]:
+            self.pos[i] = pos2[self.nodes()[(self.genes_list + [c + Constants.metabolites + Constants.reactions for c in range(Constants.intermediate)]).index(i)]]
 
         self.draw_BN(self.pos, self.genes_list)
 
@@ -90,9 +93,9 @@ class Control(nx.DiGraph):
         #ele gera a topologia (com pesos) e ja seta os ligados/desligados iniciais.
 ##        for gene1 in range(self.number_genes):
 ##            r = (True == rndm.randint(0,1))
-##            self.add_node(self.genes_list[gene1],  {'on': r or (gene1 in range(self.number_food_total)),'Next': r or (gene1 in range(self.number_food_total))})
-##            self.colors.append(palette[(r or (gene1 in range(self.number_food_total))) + 0])
-##            if r and (gene1 not in range(self.number_food_total)): #or (gene1 in range(self.number_food_total)):
+##            self.add_node(self.genes_list[gene1],  {'on': r or (gene1 in range(Constants.food)),'Next': r or (gene1 in range(Constants.food))})
+##            self.colors.append(palette[(r or (gene1 in range(Constants.food))) + 0])
+##            if r and (gene1 not in range(Constants.food)): #or (gene1 in range(Constants.food)):
 ##                self.switch_dict.update({self.genes_list[gene1]:True})
 
 ##            for gene2 in range(self.number_genes - self.number_food_actual):
@@ -117,7 +120,7 @@ class Control(nx.DiGraph):
         self.switch_dict = {}
         gene_string = []
         for n in self.nodes():
-            if n in range(self.number_food_total):
+            if n in range(Constants.food):
                 continue
             signal = 0
             control_nodes = self.predecessors(n)
@@ -144,11 +147,11 @@ class Control(nx.DiGraph):
             self.node[self.genes_list[n]]['on'] = self.node[self.genes_list[n]]['Next']
             self.colors[n] = palette[self.node[self.genes_list[n]]['on'] + 0]
             gene_string.append(self.node[self.genes_list[n]]['on'] + 0)
-        cint = 0
-        for inter in sorted([presinterm for presinterm in self.nodes() if presinterm in [q + Constants.reactions + Constants.metabolites for q in range(Constants.intermediate)]]):
+        for inter in self.intermediate_list:
             self.node[inter]['on'] = self.node[inter]['Next']
-            self.colors[self.number_genes + cint] = palette[self.node[inter]['on'] + 0]
-            cint += 1
+            self.colors[self.number_genes + self.intermediate_list.index(inter)] = palette[self.node[inter]['on'] + 0]
+            gene_string.append(self.node[inter]['on'] + 0)
+
 
 
         self.draw_BN(self.pos, self.genes_list)
@@ -174,33 +177,35 @@ class Control(nx.DiGraph):
 ##        self.draw_BN(self.pos, self.genes_list)
 
     def export_code(self):
-        pot_cn = (self.number_food_total + self.number_reac_total + self.intermediate)
-        K = self.number_food_total*pot_cn
+        pot_cn = (Constants.food + Constants.reactions + Constants.intermediate)
+        K = Constants.food*pot_cn
 
-        DNA = [0]*(pot_cn**2 - K)
+        DNA = [0]*self.DNA_length
         for a, b in self.edges():         
-            aa = a if a in range(self.number_food_total) else a - self.number_metabolites + self.number_food_total
-            bb = b - self.number_metabolites + self.number_food_total
+            aa = a if a in range(Constants.food) else a - Constants.metabolites + Constants.food
+            bb = b - Constants.metabolites + Constants.food
             DNA[bb*pot_cn + aa - K] = self.edge[a][b]['w']
 
         return DNA
         
     def import_code(self, DNA, mother = None):
         #As geracoes mutadas ja nao terao mais nodes no controle de food molecules se elas nao estiverem conectadas a nada... 
-        pot_cn = (self.number_food_total + self.number_reac_total + self.intermediate)
-        K = self.number_food_total*pot_cn
+        pot_cn = (Constants.food + Constants.reactions + Constants.intermediate)
+        K = Constants.food*pot_cn
+        DNAcount = 0
        
         for index in (i for i in xrange(len(DNA)) if abs(DNA[i]) == 1):
             a = (index + K)%pot_cn
             b = (index + K - a)/pot_cn
-            aa = a if a in range(self.number_food_total) else a + self.number_metabolites - self.number_food_total
-            bb = b + self.number_metabolites - self.number_food_total
+            aa = a if a in range(Constants.food) else a + Constants.metabolites - Constants.food
+            bb = b + Constants.metabolites - Constants.food
             self.add_edge(aa, bb, {'w': DNA[index]})
+            DNAcount += 1
      
 
         
         
-        for f in range(self.number_food_total):
+        for f in range(Constants.food):
             if f not in self.nodes():
                 self.add_node(f)
                 
@@ -210,10 +215,9 @@ class Control(nx.DiGraph):
 
         if mother is None:
             for n in self.genes_list + sorted([presinterm for presinterm in self.nodes() if presinterm in [q + Constants.reactions + Constants.metabolites for q in range(Constants.intermediate)]]):
-                #print n
                 r = (True == rndm.randint(0,1))
-                self.node[n] = {'on': r or (n in range(self.number_food_total)),'Next': r or (n in range(self.number_food_total))}
-                if r and (n not in range(self.number_food_total)) and n < Constants.metabolites + Constants.reactions:
+                self.node[n] = {'on': r or (n in range(Constants.food)),'Next': r or (n in range(Constants.food))}
+                if r and (n not in range(Constants.food)) and n < Constants.metabolites + Constants.reactions:
                     self.switch_dict.update({n: True})
 
                 self.colors.append(palette[self.node[n]['on'] + 0])
@@ -221,16 +225,15 @@ class Control(nx.DiGraph):
 
         else:
             for n in self.genes_list + sorted([presinterm for presinterm in self.nodes() if presinterm in [q + Constants.reactions + Constants.metabolites for q in range(Constants.intermediate)]]):
-                #print n
                 if n in mother.nodes():
                     self.node[n] = {'on': mother.node[n]['on'],'Next': mother.node[n]['on']}
-                    if mother.node[n]['on'] and (n not in range(self.number_food_total)) and n < Constants.metabolites + Constants.reactions: 
+                    if mother.node[n]['on'] and (n not in range(Constants.food)) and n < Constants.metabolites + Constants.reactions: 
                         self.switch_dict.update({n: True})
 
                 else:
                     r = (True == rndm.randint(0,1))
                     self.node[n] = {'on': r,'Next': r}
-                    if r and (n not in range(self.number_food_total)) and n < Constants.metabolites + Constants.reactions:
+                    if r and (n not in range(Constants.food)) and n < Constants.metabolites + Constants.reactions:
                         self.switch_dict.update({n: True})
 
                 self.colors.append(palette[self.node[n]['on'] + 0])
@@ -245,6 +248,8 @@ class Control(nx.DiGraph):
         self.draw_BN(self.pos, self.nodes())    #Na falta de alternativa melhor, desenha-se duas vezes para funcionar.
         self.draw_BN(self.pos, self.nodes())
 
+        return DNAcount
+
     def change_environment(self, food_list):
         #food_list tem que ter o comprimento do numero de food_total sempre!!
         #A posicao correspondente a molecula f deve conter True ou False,
@@ -252,7 +257,7 @@ class Control(nx.DiGraph):
 
         self.food_dict = {}
         
-        for f in range(self.number_food_total):
+        for f in range(Constants.food):
             if food_list[f]:
                 if f not in self.nodes():
                     self.add_node(f,  {'on': True,'Next': True})
