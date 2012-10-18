@@ -1,0 +1,1 @@
+constant_size('minimum_difficult',Constants.env_dict['minimum_difficult'],random_method,12)	organised/minimum_difficult/random/mutation/
